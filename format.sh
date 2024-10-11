@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
 black .
-isort --gitignore --profile black .
+fdfind .py -X isort --profile black
