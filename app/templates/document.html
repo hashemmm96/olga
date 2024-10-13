@@ -1,9 +1,21 @@
 {% extends 'base.html' %}
 
 {% block header %}
-<h1>{% block title %} {{ title }} {% endblock %}</h1>
+<h1>{% block title %}{{ title }}{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
-{{ content }}
+
+<style>
+    .tab {
+        font-family: monospace;
+        white-space: nowrap;
+        /* margin-left: -18vw; */
+    }
+</style>
+
+<div class="tab">
+    {{ content|safe }}
+</div>
+
 {% endblock %}

@@ -35,9 +35,8 @@ def create_app():
         ).fetchone()
 
         document_title = f"{format_col(artist)}: {format_col(title)}"
-        return render_template(
-            "document.html", content=content["content"], title=document_title
-        )
+        html = txt_to_html(content["content"])
+        return render_template("document.html", content=html, title=document_title)
 
     @app.route("/guides")
     def get_guide():
@@ -95,5 +94,11 @@ def create_app():
 
     def format_col(col):
         return Path(col).stem.replace("_", " ").title()
+
+    def txt_to_html(txt):
+        html = ""
+        for line in txt.splitlines():
+            html += f"{line}<br>"
+        return html
 
     return app
