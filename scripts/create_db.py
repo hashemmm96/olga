@@ -29,7 +29,7 @@ def main():
     parser.add_argument(
         "--skip-db",
         action="store_true",
-        help="skip gunzip",
+        help="skip db populate",
     )
 
     args = parser.parse_args()
@@ -87,28 +87,6 @@ def gunzip(tmpdir):
 
 
 def create_records(db, tmpdir):
-    db = sqlite3.connect(db)
-
-    tab_values = "artist, title, content"
-    tab_values_parameters = "".join([":" + value for value in tab_values.split(" ")])
-    tab_name = "tabs"
-    tab_table = f"{tab_name}({tab_values})"
-    # For the actual tabs
-    db.execute(
-        f"CREATE TABLE IF NOT EXISTS {tab_name}({tab_values}, UNIQUE({tab_values}))"
-    )
-
-    # For other_stuff folder
-    resource_values = "title, content"
-    resource_values_parameters = "".join(
-        [":" + value for value in resource_values.split(" ")]
-    )
-    resource_name = "resources"
-    resource_table = f"{resource_name}({resource_values})"
-    db.execute(
-        f"CREATE TABLE IF NOT EXISTS {resource_name}({resource_values}, UNIQUE({resource_values}))"
-    )
-
     files = walk(tmpdir)
     tab_data = []
     other_data = []
@@ -135,13 +113,63 @@ def create_records(db, tmpdir):
             other_data.append(record)
 
     print("Populating database...")
+    db = sqlite3.connect(db)
+
+    artist = "artist"
+    title = "title"
+    content = "content"
+    tab_values = f"{artist}, {title}, {content}"
+    tab_values_parameters = f":{artist}, :{title}, :{content}"
+    tab_name = "tabs"
+
+    # For other_stuff folder
+    resource_values = "title, content"
+    resource_values_parameters = "".join(
+        [":" + value for value in resource_values.split(" ")]
+    )
+    resource_name = "resources"
+    resource_table = f"{resource_name}({resource_values})"
+
+    fts_values = f"{artist}, {title}"
+    fts_name = f"{tab_name}_fts"
+
     with db:
+        db.executescript(
+            f"""
+            BEGIN;
+
+            CREATE TABLE IF NOT EXISTS {tab_name}({tab_values}, UNIQUE({tab_values}));
+            CREATE TABLE IF NOT EXISTS {resource_name}({resource_values}, UNIQUE({resource_values}));
+            CREATE VIRTUAL TABLE IF NOT EXISTS {fts_name} USING fts5 ({fts_values});
+
+            CREATE TRIGGER IF NOT EXISTS insert_{fts_name} AFTER INSERT ON {tab_name}
+            BEGIN 
+                INSERT INTO {fts_name} ({fts_values}) VALUES (NEW.{artist}, NEW.{title});
+            END;
+
+            CREATE TRIGGER IF NOT EXISTS update_{fts_name}
+            AFTER UPDATE ON {tab_name}
+            BEGIN
+                UPDATE {fts_name} SET {title}=NEW.{title} WHERE {artist}=NEW.{artist};
+            END;
+
+            CREATE TRIGGER IF NOT EXISTS delete_{fts_name}
+            AFTER DELETE ON {tab_name}
+            BEGIN
+                DELETE FROM {fts_name}
+                WHERE {title} = OLD.{title};
+            END;
+
+            COMMIT;
+            """
+        )
+
         db.executemany(
-            f"INSERT OR IGNORE INTO {tab_table} VALUES({tab_values_parameters})",
+            f"INSERT OR IGNORE INTO {tab_name}({tab_values}) VALUES({tab_values_parameters})",
             tab_data,
         )
         db.executemany(
-            f"INSERT OR IGNORE INTO {resource_table} VALUES({resource_values_parameters})",
+            f"INSERT OR IGNORE INTO {resource_name}({resource_values}) VALUES({resource_values_parameters})",
             other_data,
         )
 
@@ -151,6 +179,13 @@ def create_records(db, tmpdir):
 def is_text_mimetype_file(file):
     mimetype = magic.from_file(file, mime=True)
     return mimetype == "text/plain" or mimetype == "message/rfc822"
+
+
+def new_sql_values(values):
+    new_values = []
+    for val in values.split(" "):
+        new_values.append("NEW." + val)
+    return "".join(new_values)
 
 
 def walk(path):

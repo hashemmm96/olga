@@ -71,22 +71,11 @@ def create_app():
         return render_template("document.html", content=html, title=document_title)
 
     def search(search_text):
-        subs = {
-            " ": "_",
-            "-": "_",
-            "å": "a",
-            "ä": "a",
-            "ö": "o",
-        }
-        expr = search_text.strip()
-        for k, v in subs.items():
-            expr = expr.replace(k, v)
-
-        params = {"expr": f".*{expr}.*"}
+        params = {"search": search_text}
 
         db = get_db()
         tab_search = db.execute(
-            "SELECT artist,title from tabs WHERE artist REGEXP :expr OR title REGEXP :expr",
+            "SELECT * FROM tabs_fts WHERE tabs_fts = :search ORDER BY rank",
             params,
         ).fetchall()
 
