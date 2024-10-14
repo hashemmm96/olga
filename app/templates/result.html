@@ -13,11 +13,4 @@
 <h3><a href={{ tab["link"] }}>{{ tab["entry"] }}</a> </h3>
 {% endfor %}
 
-{% if guides|length > 0 %}
-<h2>Guides:</h2>
-{% endif %}
-{% for guide in guides %}
-<h3><a href={{ guide["link"] }}>{{ guide["entry"] }}</a> </h3>
-{% endfor %}
-
 {% endblock %}

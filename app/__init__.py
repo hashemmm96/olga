@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, render_template, request
 
 from app.db import get_db
 
@@ -13,11 +13,26 @@ def create_app():
     )
 
     @app.route("/", methods=["GET", "POST"])
-    def home():
+    def index():
         if request.method == "POST":
             return search(request.form["search-bar"])
 
-        return render_template("index.html")
+        db = get_db()
+        resource_search = db.execute(
+            "SELECT title from resources ORDER BY title ASC",
+        ).fetchall()
+        resources = []
+        for result in resource_search:
+            title_result = result["title"]
+            title = format_col(title_result)
+            resources.append(
+                {
+                    "entry": f"{title}",
+                    "link": f"/resources?title={title_result}",
+                }
+            )
+
+        return render_template("index.html", resources=resources)
 
     @app.route("/tabs")
     def get_tab():
@@ -38,9 +53,22 @@ def create_app():
         html = txt_to_html(content["content"])
         return render_template("document.html", content=html, title=document_title)
 
-    @app.route("/guides")
-    def get_guide():
-        return "HEJ"
+    @app.route("/resources")
+    def get_resource():
+        title = request.args["title"]
+        params = {
+            "title": title,
+        }
+
+        db = get_db()
+        content = db.execute(
+            "SELECT content from resources WHERE title == :title",
+            params,
+        ).fetchone()
+
+        document_title = format_col(title)
+        html = txt_to_html(content["content"])
+        return render_template("document.html", content=html, title=document_title)
 
     def search(search_text):
         subs = {
@@ -61,9 +89,6 @@ def create_app():
             "SELECT artist,title from tabs WHERE artist REGEXP :expr OR title REGEXP :expr",
             params,
         ).fetchall()
-        guide_search = db.execute(
-            "SELECT title from guides WHERE title REGEXP :expr", params
-        ).fetchall()
 
         tabs = []
         for result in tab_search:
@@ -79,18 +104,7 @@ def create_app():
                 }
             )
 
-        guides = []
-        for result in guide_search:
-            title_result = result["title"]
-            title = format_col(title_result)
-            guides.append(
-                {
-                    "entry": f"{title}",
-                    "link": f"/guides?title={title_result}",
-                }
-            )
-
-        return render_template("result.html", tabs=tabs, guides=guides)
+        return render_template("result.html", tabs=tabs)
 
     def format_col(col):
         return Path(col).stem.replace("_", " ").title()

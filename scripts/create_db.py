@@ -99,14 +99,14 @@ def create_records(db, tmpdir):
     )
 
     # For other_stuff folder
-    guide_values = "title, content"
-    guide_values_parameters = "".join(
-        [":" + value for value in guide_values.split(" ")]
+    resource_values = "title, content"
+    resource_values_parameters = "".join(
+        [":" + value for value in resource_values.split(" ")]
     )
-    guide_name = "guides"
-    guide_table = f"{guide_name}({guide_values})"
+    resource_name = "resources"
+    resource_table = f"{resource_name}({resource_values})"
     db.execute(
-        f"CREATE TABLE IF NOT EXISTS {guide_name}({guide_values}, UNIQUE({guide_values}))"
+        f"CREATE TABLE IF NOT EXISTS {resource_name}({resource_values}, UNIQUE({resource_values}))"
     )
 
     files = walk(tmpdir)
@@ -141,7 +141,7 @@ def create_records(db, tmpdir):
             tab_data,
         )
         db.executemany(
-            f"INSERT OR IGNORE INTO {guide_table} VALUES({guide_values_parameters})",
+            f"INSERT OR IGNORE INTO {resource_table} VALUES({resource_values_parameters})",
             other_data,
         )
 

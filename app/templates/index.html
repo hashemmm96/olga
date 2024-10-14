@@ -9,4 +9,10 @@
     <input type="search" name="search-bar" id="search-bar" required>
     <input type="submit" value="Search">
 </form>
+
+<h2>Other resources:</h2>
+{% for resource in resources %}
+<h3><a href={{ resource["link"] }}>{{ resource["entry"] }}</a> </h3>
+{% endfor %}
+
 {% endblock %}
