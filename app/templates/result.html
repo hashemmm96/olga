@@ -1,14 +1,18 @@
 {% extends 'base.html' %}
 
 {% block header %}
-<h1>{% block title %}Search Results{% endblock %}</h1>
+<h1>{% block title %}Search{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
+{% include 'search.html' %}
 
 {% if tabs|length > 0 %}
-<h2>Tabs:</h2>
+<h2>Search Results</h1>
+{% else %}
+<h2>No results found</h1>
 {% endif %}
+
 {% for tab in tabs %}
 <h3><a href={{ tab["link"] }}>{{ tab["entry"] }}</a> </h3>
 {% endfor %}

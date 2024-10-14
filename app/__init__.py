@@ -75,7 +75,7 @@ def create_app():
 
         db = get_db()
         tab_search = db.execute(
-            "SELECT * FROM tabs_fts WHERE tabs_fts = :search ORDER BY rank",
+            "SELECT * FROM tabs_fts WHERE tabs_fts MATCH :search ORDER BY rank",
             params,
         ).fetchall()
 
