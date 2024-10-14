@@ -7,7 +7,7 @@
 {% block content %}
 
 <style>
-    .print-button {
+    .navigation {
         margin-bottom: 0.5cm;
     }
 
@@ -17,7 +17,7 @@
     }
 
     @media print {
-        .print-button {
+        .navigation {
             display: none;
         }
 
@@ -32,8 +32,11 @@
     }
 </style>
 
-<div class="print-button">
-    <button type="button" onclick="window.print()"><b>Print</b></button>
+<div class="navigation">
+    {% include 'search.html' %}
+</div>
+<div class="navigation">
+    <button type="button" onclick="window.print()">Print</button>
 </div>
 
 <div class="tab">
