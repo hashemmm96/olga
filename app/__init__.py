@@ -72,7 +72,7 @@ def create_app():
         return render_template("document.html", content=html, title=document_title)
 
     def search(search_text):
-        params = {"search": re.sub("[^\w ]+", " ", search_text)}
+        params = {"search": re.sub("[^\\w ]+", " ", search_text)}
 
         db = get_db()
         tab_search = db.execute(
