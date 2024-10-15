@@ -1,0 +1,7 @@
+services:
+  app:
+    restart: always
+    build: .
+    volumes:
+      - ./db.sqlite3:/db.sqlite3
+    network_mode: host
