@@ -1,9 +1,15 @@
 black==24.10.0
+blinker==1.8.2
 click==8.1.7
+Flask==3.0.3
 isort==5.13.2
+itsdangerous==2.2.0
+Jinja2==3.1.4
+MarkupSafe==3.0.1
 mypy-extensions==1.0.0
 packaging==24.1
 pathspec==0.12.1
 platformdirs==4.3.6
 python-magic==0.4.27
 tqdm==4.66.5
+Werkzeug==3.0.4
