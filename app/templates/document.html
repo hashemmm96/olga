@@ -1,36 +1,12 @@
 {% extends 'base.html' %}
 
 {% block header %}
-<h1>{% block title %}{{ title }}{% endblock %}</h1>
+<h2>{% block title %} {{ title }} {% endblock %}</h2>
 {% endblock %}
 
 {% block content %}
 
-<style>
-    .navigation {
-        margin-bottom: 0.5cm;
-    }
-
-    .tab {
-        font-family: monospace;
-        white-space: nowrap;
-    }
-
-    @media print {
-        .navigation {
-            display: none;
-        }
-
-        @page {
-            margin-left: 0.5cm;
-            margin-right: 2cm;
-            margin-top: 2cm;
-            margin-bottom: 2cm;
-            size: A4;
-            size: portrait;
-        }
-    }
-</style>
+<link rel="stylesheet" href={{ url_for ('static', filename='docstyle.css') }}>
 
 <div class="navigation">
     {% include 'search.html' %}

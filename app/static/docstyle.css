@@ -1,0 +1,51 @@
+.navigation {
+    margin-bottom: 0.5cm;
+}
+
+p {
+    margin: 0;
+}
+
+.docsection {
+    margin: 1em;
+}
+
+.tab {
+    font-family: monospace;
+    white-space: nowrap;
+}
+
+@media print {
+    .navigation {
+        display: none;
+    }
+
+    p {
+        break-inside: avoid-page;
+    }
+
+    .tab {
+        display: block;
+    }
+
+    .docsection {
+        display: block;
+    }
+
+    section {
+        display: block;
+    }
+
+    body {
+        display: block;
+    }
+
+    @page {
+        margin-left: 1cm;
+        margin-right: 1cm;
+        margin-top: 2cm;
+        margin-bottom: 2cm;
+        size: A4;
+        size: portrait;
+    }
+}

@@ -100,9 +100,19 @@ def create_app():
         return Path(col).stem.replace("_", " ").title()
 
     def txt_to_html(txt):
-        html = ""
+        div_start = """<div class="docsection">\n"""
+        div_end = "</div>\n"
+        html = div_start
+
         for line in txt.splitlines():
-            html += f"{line}<br>"
+            if line.strip() == "":
+                html += div_end
+                html += div_start
+            html += f"<p>{line}</p>\n"
+
+        if not html.endswith(div_end):
+            html += div_end
+
         return html
 
     return app
